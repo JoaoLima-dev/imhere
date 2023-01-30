@@ -1,17 +1,35 @@
-import {Text, View, TextInput, TouchableOpacity, FlatList} from "react-native";
+import React, { useState } from 'react';
+import {Text, View, TextInput, TouchableOpacity, FlatList, Alert} from "react-native";
 import { Participant } from "../../components/participant";
 
 import { styles } from "./styles";
 
 export default function Home() {
-  const participants = ["John", "Shean", "Mary", "Kate","Joseph", "Mathew", "Hanna", "Kimberly", "Ann"];
+  const [participants, setParticipants] = useState<string[]>([]);
+  const [participantName, setParticipantName] = useState('');
 
   function handleParticipantAdd() {
-    console.log("You clicked at Add button!");
+    if(participants.includes(participantName)){
+      return Alert.alert("Participant exist", "Already have one participant with this name on the list")
+    }
+
+    setParticipants(prevState => [...prevState, participantName]);
+    setParticipantName('');
   }
 
   function handleParticipantRemove(name: string) {
-    console.log(`vc removeu o participante ${name}`);
+
+    Alert.alert("Delete", `Delete the participant ${name}?`, [
+      {
+        text: "Yes",
+        onPress: () =>  setParticipants(prevState => prevState.filter(participant => participant !== name))
+      },
+      {
+        text: "No",
+        style: "cancel"
+      }
+    ])
+    
   }
 
   return (
@@ -24,6 +42,8 @@ export default function Home() {
           style={styles.input}
           placeholder="Participant Name"
           placeholderTextColor="#6B6B6B"
+          onChangeText={setParticipantName}
+          value={participantName}
         />
         <TouchableOpacity style={styles.button} onPress={handleParticipantAdd}>
           <Text style={styles.buttonText}>+</Text>
@@ -37,10 +57,15 @@ export default function Home() {
         <Participant
           key={item}
           name={item}
-          onRemove={() => handleParticipantRemove("Rodrigo")}
+          onRemove={() => handleParticipantRemove(item)}
         />
         )}
         showsVerticalScrollIndicator={false}
+        ListEmptyComponent={() => (
+          <Text style={styles.listEmptyText}>
+            Add Participants
+          </Text>
+        )}
       />
         
       
